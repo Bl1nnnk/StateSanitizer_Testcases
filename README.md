@@ -49,7 +49,7 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 1. 选择Release编译。
 2. 右键项目 => 属性 => 配置属性 => C/C++ => 代码生成 => 运行库 => 选择多线程。
 
-![静态编译](doc/img/img0.jpeg)
+![静态编译](doc/img/img0.JPEG)
 
 ## 添加hypercall
 
@@ -65,18 +65,18 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 6. 点击应用，右侧“配置属性”会出现“自定义生成工具”一项。
 7. 点击“自定义生成工具”，在“命令行”输入`ml64 /Fo $(IntDir)%(fileName).obj /c %(fileName).asm`，在“输出”中输入`$(IntDir)%(fileName).obj`。
 
-![生成中排除-否](doc/img/img1.jpeg)
+![生成中排除-否](doc/img/img1.JPEG)
 
-![项类型](doc/img/img2.jpeg)
+![项类型](doc/img/img2.JPEG)
 
-![自定义生成工具](doc/img/img3.jpeg)
+![自定义生成工具](doc/img/img3.JPEG)
 
 ### 代码插入
 1. 在main文件中添加`#include "agent.h"`
 2. 在mian函数的开始，添加`tp_hypercall(TP_FUNC_SUBMIT_CR3, 0);`
 3. 在测试目标API之前，添加`tp_hypercall(TP_FUNC_BEGIN_FUZZ, 0);`
 
-![代码插入](doc/img/img4.jpeg)
+![代码插入](doc/img/img4.JPEG)
 
 ## 编译并测试testcase
 保证测试用例中API被正确的调用。
