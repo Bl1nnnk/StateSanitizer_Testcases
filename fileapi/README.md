@@ -6,6 +6,8 @@ FlushFileBuffers()，LockFileEx()，UnlockFileEx()，GetFileAttributesExA()
 ```
 
 - testcase1
+
+care about: **在运行目录下需存在 dir目录，里面存放 1.txt，2.txt**
 ```
 AreFileApisANSI()->GetACP(),AreShortNamesEnabled()->GetVolumeInformation(),CreateDirectoryA(),CreateDirectoryW(),CreateFile2(),CreateFileA(),CreateFileW(),
 DefineDosDeviceW()->DefineDosDevice(),DeleteFileA(),DeleteFileW(),DeleteVolumeMountPointW(),FindClose(),FindCloseChangeNotification(),
