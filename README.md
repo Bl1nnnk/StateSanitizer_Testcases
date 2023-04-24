@@ -49,11 +49,10 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 1. 选择Release编译。
 2. 右键项目 => 属性 => 配置属性 => C/C++ => 代码生成 => 运行库 => 选择多线程。
 
-![静态编译](doc/img/img0.JPEG)
-
 ## 添加hypercall
 
-### 添加文件
+### Visual Studio
+#### 添加文件
 
 在项目中添加agent.h和hypercall.asm，并正确设置hypercall.asm的编译：
 
@@ -71,12 +70,20 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 
 ![自定义生成工具](doc/img/img3.JPEG)
 
-### 代码插入
+#### 代码插入
+每个Testcase只需要插入一次即可。
 1. 在main文件中添加`#include "agent.h"`
-2. 在mian函数的开始，添加`tp_hypercall(TP_FUNC_SUBMIT_CR3, 0);`
-3. 在测试目标API之前，添加`tp_hypercall(TP_FUNC_BEGIN_FUZZ, 0);`
+2. 在mian函数的开始，添加`ss_hypercall(SS_HC_SUBMIT_CR3, 0);`
+3. 在测试目标API之前，添加`ss_hypercall(SS_HC_BEGIN_TEST, 0);`
 
 ![代码插入](doc/img/img4.JPEG)
+
+### 利用脚本
+需要在`x64 Native Tools Command Prompt for VS 2022`里面运行脚本，编译出的程序在out子目录中：
+![VS_Prompt](doc/img/VS_Prompt.PNG)
+![Injection_Example](doc/img/Injection_Example.PNG)
+- Example
+	[hypecall_injection](hypecall_injection)
 
 ## 编译并测试testcase
 保证测试用例中API被正确的调用。
