@@ -56,7 +56,7 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 
 在项目中添加agent.h和hypercall.asm，并正确设置hypercall.asm的编译：
 
-1. 将[example](example/testcase0)中的文件agent.h和hypercall.asm放到项目文件夹中。
+1. 将[example](src/example/testcase0)中的文件agent.h和hypercall.asm放到项目文件夹中。
 2. 在“头文件”中添加agent.h，在“源文件”中添加hypercall.asm.
 3. 右键hypercall.asm，选择属性。
 4. “从生成中排除”选择“否”。
@@ -83,7 +83,7 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 ![VS_Prompt](doc/img/VS_Prompt.PNG)
 ![Injection_Example](doc/img/Injection_Example.PNG)
 - Example
-	[hypecall_injection](hypecall_injection)
+	[hypecall_injection](src/hypecall_injection)
 
 ## 编译并测试testcase
 保证测试用例中API被正确的调用。
@@ -91,4 +91,4 @@ typedef enum _FILE_INFO_BY_HANDLE_CLASS {
 ## 欢迎建设自动化方案实现上面步骤
 
 # Example
-一个完整的测试用例[demo](example/testcase0)，里面包含了agent.h和hypercall.asm文件。
+一个完整的测试用例[demo](src/example/testcase0)，里面包含了agent.h和hypercall.asm文件。

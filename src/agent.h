@@ -307,7 +307,7 @@ extern "C" {
  * @rcx is argument whose actual structure is dependent on the class of thus hypercall.
  * The return value is in rdi return value when cpuid returns.
  * */
-#if defined(WIN32)
+#if defined(WIN32) || defined(_WIN32)
 target_ulong ss_hypercall(target_ulong rcx, target_ulong rdx);
 #else /* gcc-like compiler */
 static inline target_ulong ss_hypercall(target_ulong rbx, target_ulong rcx)

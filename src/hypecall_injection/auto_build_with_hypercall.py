@@ -17,7 +17,7 @@ def usage():
     print("*.py testcase_file_name")
     
 def build(source_name, hc_fname, out_dir):
-    shutil.copyfile('agent.h', f'{out_dir}/agent.h')
+    shutil.copyfile('../agent.h', f'{out_dir}/agent.h')
     shutil.copyfile(f'{hc_fname}.asm', f'{out_dir}/{hc_fname}.asm')
 
     os.chdir(out_dir)
