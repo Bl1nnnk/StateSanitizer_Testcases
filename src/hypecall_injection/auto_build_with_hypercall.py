@@ -8,17 +8,16 @@ import shutil
 
 out_dir = 'out'
 hc_fname = 'hypercall'
+agent_dir = '..'
 
 cc = 'cl.exe'
 asm_cc = 'ml64.exe'
 linker = "link.exe"
 
 def usage():
-    print("*.py testcase_file_name")
+    print("*.py [insert | build] testcase_file_name")
     
 def build(source_name, hc_fname, out_dir):
-    shutil.copyfile('../agent.h', f'{out_dir}/agent.h')
-    shutil.copyfile(f'{hc_fname}.asm', f'{out_dir}/{hc_fname}.asm')
 
     os.chdir(out_dir)
         
@@ -28,7 +27,8 @@ def build(source_name, hc_fname, out_dir):
     if 0 != os.system(f'{cc} -DWIN32 /c {source_name}.cpp'):
         return
         
-    os.system(f'{linker} -out:{source_name}.exe {source_name}.obj {hc_fname}.obj ')
+    if 0 == os.system(f'{linker} -out:{source_name}.exe {source_name}.obj {hc_fname}.obj '):
+        print("Build complete.")
 
 def inject_hc(filename):
     # 打开待读取的文件function_name.cpp
@@ -60,16 +60,25 @@ def inject_hc(filename):
         file_b.close()
         
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         usage()
         return
         
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
         
-    filename = sys.argv[1]
-    inject_hc(filename)
-    build(filename, hc_fname, out_dir)
+    shutil.copyfile(f'{agent_dir}/agent.h', f'{out_dir}/agent.h')
+    shutil.copyfile(f'{agent_dir}/{hc_fname}.asm', f'{out_dir}/{hc_fname}.asm')
+    
+    filename = sys.argv[2]
+    if sys.argv[1] == "insert":
+        inject_hc(filename)
+        build(filename, hc_fname, out_dir)
+    elif sys.argv[1] == "build":
+        shutil.copyfile(f'{filename}.cpp', f'{out_dir}/{filename}.cpp')
+        build(filename, hc_fname, out_dir)
+    else:
+        usage()
         
 if __name__ == "__main__":
     main()

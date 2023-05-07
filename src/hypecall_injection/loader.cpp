@@ -2,7 +2,7 @@
 
 Copyright (C) 2017 Robert Gawlik
 
-This file is part of kAFL Fuzzer (kAFL).
+This file is part of kAFL state sanitizer (kAFL).
 
 QEMU-PT is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,28 +41,28 @@ PCSTR kernel_func2 = "KeBugCheckEx";
 #pragma comment(lib,"dbghelp.lib")
 
 #define l_log(...)	 { \
-	printf("[+]Loader: "); \
 	printf(__VA_ARGS__); \
-	msg_len = sprintf_s(message, 255, __VA_ARGS__); \
+	msg_len = sprintf_s(message, 1024, "loader log: "); \
+	msg_len = sprintf_s(message + msg_len, 1024, __VA_ARGS__); \
 	tp.message_addr = (target_ulong)message; \
 	tp.message_len = msg_len; \
-	kAFL_hypercall(TP_FUNC_PRINT, (target_ulong)&tp); \
+	ss_hypercall(SS_HC_PRINT, (target_ulong)&tp); \
 }
 
 #define l_elog(...) { \
-	printf("[+]Loader: "); \
 	printf(__VA_ARGS__); \
-	msg_len = sprintf_s(message, 255, __VA_ARGS__); \
+	msg_len = sprintf_s(message, 1024, "loader error: "); \
+	msg_len = sprintf_s(message + msg_len, 1024, __VA_ARGS__); \
 	tp.message_addr = (target_ulong)message; \
 	tp.message_len = msg_len; \
-	kAFL_hypercall(TP_FUNC_PRINT, (target_ulong)&tp); \
+	ss_hypercall(SS_HC_PRINT, (target_ulong)&tp); \
 }
 
 #define TP_MSG
 
-char message[255];
+char message[1024];
 int32_t msg_len;
-tp_print tp;
+ss_print tp;
 
 void my_exit(int r)
 {
@@ -98,7 +98,7 @@ BOOL CALLBACK EnumSymProc(
 {
 	UNREFERENCED_PARAMETER(UserContext);
 	
-	l_log("%08X %4u %s\n", 
+	l_log("%08llX %4u %s\n", 
 		   pSymInfo->Address, SymbolSize, pSymInfo->Name);
 	return TRUE;
 }
@@ -195,7 +195,7 @@ static inline void load_program(void* buf){
 		NULL
 	);
 	if (result == 0){
-		l_elog("Cannot write usermode fuzzer (%ld)\n", GetLastError());
+		l_elog("Cannot write usermode state sanitizer (%ld)\n", GetLastError());
 		/* blocks */
 		getchar();
 	}
@@ -222,19 +222,18 @@ int main(int argc, char** argv){
 	}
 
 
-	/* allocate 4MB contiguous virtual memory to hold fuzzer program; data is provided by the fuzzer */
+	/* allocate 4MB contiguous virtual memory to hold state sanitizer program; data is provided by the state sanitizer */
 	program_buffer = (void*)VirtualAlloc(0, PROGRAM_SIZE, MEM_COMMIT, PAGE_READWRITE);
 	/* ensure that the virtual memory is *really* present in physical memory... */
 	memset(program_buffer, 0xff, PROGRAM_SIZE);
 
 
 	//enum_nt_symbol();
-	/* this hypercall will generate a VM snapshot for the fuzzer and subsequently terminate QEMU */
-	//kAFL_hypercall(HYPERCALL_KAFL_LOCK, 0);
+	/* this hypercall will generate a VM snapshot for the state sanitizer and subsequently terminate QEMU */
 
 	sv.sp_name = (target_ulong)"loader";
 	sv.name_len = sizeof("loader");
-	ret_status = kAFL_hypercall(TP_FUNC_SAVE_VM, (target_ulong)&sv);
+	ret_status = ss_hypercall(SS_HC_SAVE_VM, (target_ulong)&sv);
 	if (ret_status == HYPER_STATUS_SUCCESS)
 	{
 		l_log("savevm success, ret_status %08x\n", ret_status);
@@ -242,20 +241,20 @@ int main(int argc, char** argv){
 		l_log("savevm fail, ret_status %08x\n", ret_status);
 	}
 
-	/***** Fuzzer Entrypoint *****/
+	/***** state sanitizer Entrypoint *****/
 
-	/* submit panic address */
-	//kAFL_hypercall(HYPERCALL_KAFL_SUBMIT_PANIC, panic_handler1);
-	//kAFL_hypercall(HYPERCALL_KAFL_SUBMIT_PANIC, panic_handler2);
-	/* submit virtual address of program buffer and wait for data (*blocking*) */
-	//kAFL_hypercall(HYPERCALL_KAFL_GET_PROGRAM, (UINT64)program_buffer);
 	gp.program_buffer = (target_ulong)program_buffer;
 	gp.buffer_len = PROGRAM_SIZE;
-	ret_status = kAFL_hypercall(TP_FUNC_GET_PROGRAM, (UINT64)&gp);
+	ret_status = ss_hypercall(SS_HC_GET_PROGRAM, (UINT64)&gp);
 	if (ret_status == HYPER_STATUS_SUCCESS) {
 		l_log("Successfully get program from host. ret_staus %08x\n", ret_status);
-		/* execute fuzzer program */
+		
+		ss_hypercall(SS_HC_BEGINE_RECORD, 0);
+		
+		/* execute state sanitizer program */
 		load_program(program_buffer);
+		
+		ss_hypercall(SS_HC_BEGINE_RECORD, 0);
 	}
 	l_log("get program fail, ret_status %08x\n", ret_status);
 	/* bye */ 
