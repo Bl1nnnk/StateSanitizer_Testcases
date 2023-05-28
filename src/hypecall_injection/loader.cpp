@@ -161,12 +161,11 @@ static inline void run_program(void* target){
 	l_log("Starting fuzzing target\n");
 	BOOL success = CreateProcessA(NULL, (LPSTR)target, NULL, NULL, FALSE,
 		0, NULL, NULL, &s1, &p1);
+		
+	WaitForSingleObject(p1.hProcess, INFINITE);
 	if (!success){
 		l_log("Cannot start fuzzing target, error code: %d\n", GetLastError());
-		getchar();
-		ExitProcess(0);
 	}
-	TerminateProcess((HANDLE)-1,0x41);
 }
 
 static inline void load_program(void* buf){
@@ -254,9 +253,10 @@ int main(int argc, char** argv){
 		/* execute state sanitizer program */
 		load_program(program_buffer);
 		
-		ss_hypercall(SS_HC_BEGINE_RECORD, 0);
+		ss_hypercall(SS_HC_END_RECORD, 0);
+	} else {
+		l_log("get program fail, ret_status %08x\n", ret_status);
 	}
-	l_log("get program fail, ret_status %08x\n", ret_status);
 	/* bye */ 
 	return 0;
 }

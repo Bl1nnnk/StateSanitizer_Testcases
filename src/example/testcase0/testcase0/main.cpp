@@ -1,11 +1,13 @@
 #include <Windows.h>
 #include <iostream>
+#include <evntrace.h>
 
 #include "../../../agent.h"
 
 int main()
 {
     ss_hypercall(SS_HC_SUBMIT_CR3, 0);
+    printf("ÄãºÃ");
 
     HANDLE hFile = CreateFile(L"example.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE)

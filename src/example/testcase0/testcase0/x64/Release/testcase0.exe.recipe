@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Just4Admin\Desktop\State Sanitizer\testcases\StateSanitizer_Testcases\example\testcase0\x64\Release\testcase0.exe</FullPath>
+      <FullPath>C:\Users\Just4Admin\Desktop\State Sanitizer\testcases\StateSanitizer_Testcases\src\example\testcase0\x64\Release\testcase0.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
